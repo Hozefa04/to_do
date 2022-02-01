@@ -27,6 +27,7 @@ class AuthCubit extends Cubit<AuthState> {
         accessToken: googleAuth?.accessToken,
         idToken: googleAuth?.idToken,
       );
+
       await _firebaseAuth.signInWithCredential(credential).then((value) {
       });
     } catch (e) {
@@ -41,6 +42,13 @@ class AuthCubit extends Cubit<AuthState> {
     } catch (e) {
       throw Exception(e);
     }
+  }
+
+  String? getPhotoUrl() {
+    if(_firebaseAuth.currentUser != null) {
+      return _firebaseAuth.currentUser?.photoURL;
+    }
+    return "";
   }
 
   String getUserId() {

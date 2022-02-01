@@ -1,9 +1,19 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:intl/intl.dart';
 import 'package:to_do/cubit/auth/auth_cubit.dart';
+import 'package:to_do/cubit/color_picker/color_cubit.dart';
+import 'package:to_do/utils/app_colors.dart';
 import 'package:to_do/utils/app_strings.dart';
+import 'package:to_do/utils/text_styles.dart';
 
 class AppMethods {
+  static final _auth = FirebaseAuth.instance;
+  static final _firestoreInstance = FirebaseFirestore.instance;
+
   //google signin
   static Future<void> signInWithGoogle(BuildContext context) async {
     var _cubit = BlocProvider.of<AuthCubit>(context);
@@ -33,4 +43,87 @@ class AppMethods {
       );
     }
   }
+
+  //get user id
+  static String? getUid() => _auth.currentUser?.uid;
+
+  //get profile image url
+  static String? getPhotoUrl() => _auth.currentUser?.photoURL;
+
+  //get timestamp
+  static int getTimeStamp() => DateTime.now().microsecondsSinceEpoch;
+
+  //store notes in firebase
+  static bool storeNoteInFirebase(String title, String notes, int? color) {
+    _firestoreInstance.collection("notes").doc(getUid()).collection("user_notes").doc().set({
+      'timestamp': getTimeStamp(),
+      'title': title,
+      'notes': notes,
+      'color': color ?? AppColors.primaryColor.value,
+    }).onError((error, stackTrace) => false);
+    return true;
+  }
+
+  //get converted time
+  static String getConvertedTime(int timestamp) {
+    var convertedDate = DateTime.fromMicrosecondsSinceEpoch(timestamp);
+    var format = DateFormat.yMEd().format(convertedDate).toString();
+    return format;
+  }
+
+  //retrieve notes from firebase
+  static Stream<QuerySnapshot<Map<String, dynamic>>> getNotes() {
+    return _firestoreInstance.collection("notes").doc(getUid()).collection("user_notes").snapshots();
+  }
+
+  //add notes
+  static void addNotes(BuildContext context, String title, String notes) {
+    bool isDone;
+    var _cubit = BlocProvider.of<ColorCubit>(context);
+    isDone = AppMethods.storeNoteInFirebase(title, notes, _cubit.pickedColor?.value);
+    if (isDone) {
+      Scaffold.of(context)
+          .showSnackBar(const SnackBar(content: Text("Note Added")));
+    } else {
+      Scaffold.of(context).showSnackBar(const SnackBar(
+        content: Text("There was some error adding the note"),
+      ));
+    }
+  }
+
+  static void openColorPicker(BuildContext context, [Color? pickedColor]) {
+    showDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          title: Text(
+            'Pick a color!',
+            style: TextStyles.primaryRegular,
+          ),
+          content: SingleChildScrollView(
+            child: ColorPicker(
+              onColorChanged: (color) => changeColor(color, context),
+              pickerColor: pickedColor ?? AppColors.redColor,
+              paletteType: PaletteType.hueWheel,
+            ),
+          ),
+          actions: [
+            IconButton(
+              onPressed: () => Navigator.of(context).pop(),
+              icon: Icon(
+                Icons.check_rounded,
+                color: AppColors.primaryColor,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  static void changeColor(Color color, BuildContext context) {
+    final colorCubit = BlocProvider.of<ColorCubit>(context);
+    colorCubit.setColor(color);
+  }
+
 }
