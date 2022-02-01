@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:to_do/cubit/color_picker/color_cubit.dart';
+import 'package:to_do/cubit/notes/notes_cubit.dart';
 import 'package:to_do/utils/app_methods.dart';
 import 'package:to_do/widgets/bloc_color_picker.dart';
 import 'package:to_do/widgets/custom_app_bar.dart';
@@ -15,6 +16,8 @@ class AddNotesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final titleController = TextEditingController();
     final notesController = TextEditingController();
+
+    var _notesCubit = BlocProvider.of<NotesCubit>(context);
 
     return BlocProvider(
       create: (_) => ColorCubit(),
@@ -41,7 +44,7 @@ class AddNotesPage extends StatelessWidget {
           return CustomFloatingButton(
             onPressed: () {
               if (titleController.text != "") {
-                AppMethods.addNotes(
+                _notesCubit.addNotes(
                     ctx, titleController.text, notesController.text);
               } else {
                 Scaffold.of(ctx).showSnackBar(

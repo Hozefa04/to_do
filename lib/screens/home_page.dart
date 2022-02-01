@@ -1,8 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:to_do/cubit/nav/nav_cubit.dart';
+import 'package:to_do/cubit/notes/notes_cubit.dart';
+import 'package:to_do/models/notes_model.dart';
 import 'package:to_do/screens/add_notes_page.dart';
 import 'package:to_do/screens/update_notes_page.dart';
 import 'package:to_do/utils/app_colors.dart';
@@ -19,6 +20,10 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var _navCubit = BlocProvider.of<NavCubit>(context);
+    var _notesCubit = BlocProvider.of<NotesCubit>(context);
+    var uid = AppMethods.getUid() ?? "";
+    _notesCubit.getNotes(uid);
+
     return SafeArea(
       child: Scaffold(
         appBar: const CustomAppBar(
@@ -31,7 +36,16 @@ class HomePage extends StatelessWidget {
           onPressed: () => _navCubit.routeToPage(context, const AddNotesPage()),
           icon: Icons.note_add_rounded,
         ),
-        body: const NotesBuilder(),
+        body: RefreshIndicator(
+          onRefresh: () {
+            return Future.delayed(const Duration(milliseconds: 100), () {
+              var _notesCubit = BlocProvider.of<NotesCubit>(context);
+              var uid = AppMethods.getUid() ?? "";
+              _notesCubit.getNotes(uid);
+            });
+          },
+          child: const NotesBuilder(),
+        ),
       ),
     );
   }
@@ -63,63 +77,62 @@ class NotesBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: AppMethods.getNotes(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return Container(
-            margin: const EdgeInsets.only(
-              left: 16.0,
-              right: 16.0,
-              top: 22.0,
-              bottom: 12.0,
-            ),
-            child: MasonryGridView.builder(
-              mainAxisSpacing: 12.0,
-              crossAxisSpacing: 12.0,
-              itemCount: snapshot.data?.docs.length,
-              gridDelegate:
-                  const SliverSimpleGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-              ),
-              itemBuilder: (context, index) {
-                return NotesCard(snapshot: snapshot.data?.docs[index]);
-              },
-            ),
-          );
-        }
+    return BlocBuilder<NotesCubit, NotesState>(builder: (context, state) {
+      if (state is NotesLoading) {
         return const CustomLoading();
-      },
-    );
+      } else if (state is NotesLoaded) {
+        return Container(
+          margin: const EdgeInsets.only(
+            left: 16.0,
+            right: 16.0,
+            top: 22.0,
+            bottom: 12.0,
+          ),
+          child: MasonryGridView.builder(
+            mainAxisSpacing: 12.0,
+            crossAxisSpacing: 12.0,
+            itemCount: state.notesList.length,
+            gridDelegate: const SliverSimpleGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+            ),
+            itemBuilder: (context, index) {
+              return NotesCard(snapshot: state.notesList[index]);
+            },
+          ),
+        );
+      }
+      return const CustomLoading();
+    });
   }
 }
 
 class NotesCard extends StatelessWidget {
-  final QueryDocumentSnapshot? snapshot;
+  final NotesModel snapshot;
   const NotesCard({Key? key, required this.snapshot}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     var _navCubit = BlocProvider.of<NavCubit>(context);
-    var _notesId = snapshot?.reference.id ?? "Null";
+
     return InkWell(
-      onTap: () =>
-          _navCubit.routeToPage(context, UpdateNotesPage(noteId: _notesId)),
+      onTap: () {
+        _navCubit.routeToPage(context, UpdateNotesPage(noteId: snapshot.id));
+      },
       child: Container(
         padding: const EdgeInsets.all(22.0),
         decoration: BoxDecoration(
-          color: Color(snapshot?['color']),
+          color: Color(snapshot.color),
           borderRadius: BorderRadius.circular(12.0),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            NoteTitle(title: snapshot?["title"]),
+            NoteTitle(title: snapshot.title),
             const SizedBox(height: 16.0),
-            NoteSummary(summary: snapshot?["notes"]),
+            NoteSummary(summary: snapshot.notes),
             const SizedBox(height: 16.0),
-            NoteDate(timestamp: snapshot?['timestamp']),
+            NoteDate(timestamp: snapshot.timestamp),
           ],
         ),
       ),

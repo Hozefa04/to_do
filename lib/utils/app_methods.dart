@@ -70,33 +70,6 @@ class AppMethods {
         .snapshots();
   }
 
-  //add notes
-  static void addNotes(BuildContext context, String title, String notes) {
-    bool isDone;
-    var _cubit = BlocProvider.of<ColorCubit>(context);
-    _firestoreInstance
-        .collection("notes")
-        .doc(getUid())
-        .collection("user_notes")
-        .doc()
-        .set({
-      'timestamp': getTimeStamp(),
-      'title': title,
-      'notes': notes,
-      'color': _cubit.pickedColor?.value ?? AppColors.primaryColor.value,
-    }).onError((error, stackTrace) => isDone = false);
-    isDone = true;
-
-    if (isDone) {
-      Scaffold.of(context)
-          .showSnackBar(const SnackBar(content: Text("Note Added")));
-    } else {
-      Scaffold.of(context).showSnackBar(const SnackBar(
-        content: Text("There was some error adding the note"),
-      ));
-    }
-  }
-
   //retrieve note
   static Future<DocumentSnapshot<Map<String, dynamic>>> getNote(
       BuildContext context, String noteId) {

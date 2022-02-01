@@ -17,8 +17,11 @@ class NotesField extends StatelessWidget {
         hintText: "Add your note",
         hintStyle: TextStyles.primaryRegular.copyWith(
           color: AppColors.greyColor,
+          fontSize: 18.0,
         ),
-        textStyle: TextStyles.primaryRegular,
+        textStyle: TextStyles.primaryRegular.copyWith(
+          fontSize: 18.0,
+        ),
         isMultiLine: true,
       ),
     );

@@ -11,9 +11,9 @@ class NotesLoading extends NotesState {
 }
 
 class NotesLoaded extends NotesState {
-  final Stream<QuerySnapshot<Map<String, dynamic>>> querySnapshot;
-  const NotesLoaded(this.querySnapshot);
+  final List<NotesModel> notesList;
+  const NotesLoaded(this.notesList);
 
   @override
-  List<Object?> get props => [querySnapshot];
+  List<Object?> get props => [notesList];
 }
