@@ -1,10 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:to_do/cubit/nav/nav_cubit.dart';
+import 'package:to_do/screens/add_notes_page.dart';
+import 'package:to_do/screens/update_notes_page.dart';
 import 'package:to_do/utils/app_colors.dart';
 import 'package:to_do/utils/app_methods.dart';
 import 'package:to_do/utils/app_strings.dart';
 import 'package:to_do/utils/text_styles.dart';
+import 'package:to_do/widgets/custom_app_bar.dart';
 import 'package:to_do/widgets/custom_floating_button.dart';
 import 'package:to_do/widgets/custom_loading.dart';
 
@@ -13,11 +18,17 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var _navCubit = BlocProvider.of<NavCubit>(context);
     return SafeArea(
       child: Scaffold(
-        appBar: const CustomAppBar(),
+        appBar: const CustomAppBar(
+          title: "Notes",
+          actions: [
+            ProfileButton(),
+          ],
+        ),
         floatingActionButton: CustomFloatingButton(
-          onPressed: () => Navigator.of(context).pushNamed('/notes'),
+          onPressed: () => _navCubit.routeToPage(context, const AddNotesPage()),
           icon: Icons.note_add_rounded,
         ),
         body: const NotesBuilder(),
@@ -26,36 +37,23 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
-  const CustomAppBar({Key? key}) : super(key: key);
-
-  @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+class ProfileButton extends StatelessWidget {
+  const ProfileButton({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      backgroundColor: AppColors.transparentColor,
-      elevation: 0,
-      title: Text(
-        "Notes",
-        style: TextStyles.heading,
-      ),
-      actions: [
-        InkWell(
-          onTap: () => AppMethods.logout(context),
-          child: Container(
-            margin: const EdgeInsets.only(right: 16),
-            child: CircleAvatar(
-              radius: 18.0,
-              backgroundImage: NetworkImage(
-                AppMethods.getPhotoUrl() ?? AppStrings.defaultAvatarUrl,
-              ),
-              backgroundColor: Colors.transparent,
-            ),
+    return InkWell(
+      onTap: () => AppMethods.logout(context),
+      child: Container(
+        margin: const EdgeInsets.only(right: 16),
+        child: CircleAvatar(
+          radius: 18.0,
+          backgroundImage: NetworkImage(
+            AppMethods.getPhotoUrl() ?? AppStrings.defaultAvatarUrl,
           ),
+          backgroundColor: Colors.transparent,
         ),
-      ],
+      ),
     );
   }
 }
@@ -96,27 +94,31 @@ class NotesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(22.0),
-      decoration: BoxDecoration(
-        color: Color(snapshot?['color']),
-        borderRadius: BorderRadius.circular(12.0),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          NoteTitle(title: snapshot?["title"]),
-          const SizedBox(height: 16.0),
-          NoteSummary(summary: snapshot?["notes"]),
-          const SizedBox(height: 16.0),
-          NoteDate(timestamp: snapshot?['timestamp']),
-        ],
+    var _navCubit = BlocProvider.of<NavCubit>(context);
+    var _notesId = snapshot?.reference.id ?? "Null";
+    return InkWell(
+      onTap: () => _navCubit.routeToPage(context, UpdateNotesPage(noteId: _notesId)),
+      child: Container(
+        padding: const EdgeInsets.all(22.0),
+        decoration: BoxDecoration(
+          color: Color(snapshot?['color']),
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            NoteTitle(title: snapshot?["title"]),
+            const SizedBox(height: 16.0),
+            NoteSummary(summary: snapshot?["notes"]),
+            const SizedBox(height: 16.0),
+            NoteDate(timestamp: snapshot?['timestamp']),
+          ],
+        ),
       ),
     );
   }
 }
-
 
 class NoteTitle extends StatelessWidget {
   final String title;
@@ -166,4 +168,3 @@ class NoteDate extends StatelessWidget {
     );
   }
 }
-

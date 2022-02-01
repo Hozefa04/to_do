@@ -8,6 +8,7 @@ class CustomTextField extends StatelessWidget {
   final TextStyle? hintStyle;
   final TextStyle? textStyle;
   final bool isMultiLine;
+  final String? text;
   const CustomTextField({
     Key? key,
     required this.controller,
@@ -15,12 +16,13 @@ class CustomTextField extends StatelessWidget {
     this.hintStyle,
     this.textStyle,
     required this.isMultiLine,
+    this.text
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return TextField(
-      controller: controller,
+      controller: controller..text = text ?? "",
       style: textStyle ?? TextStyles.primaryBold,
       cursorColor: AppColors.primaryColor,
       maxLines: isMultiLine ? null : 1,

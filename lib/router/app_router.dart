@@ -3,6 +3,7 @@ import 'package:to_do/screens/add_notes_page.dart';
 import 'package:to_do/screens/home_page.dart';
 import 'package:to_do/screens/landing_page.dart';
 import 'package:to_do/screens/login_page.dart';
+import 'package:to_do/screens/update_notes_page.dart';
 
 //Navigator.of(context).pushNamed('/');
 
@@ -19,7 +20,7 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const LoginPage());
         break;
       case '/notes':
-        return MaterialPageRoute(builder: (_) => AddNotesPage());
+        return MaterialPageRoute(builder: (_) => const AddNotesPage());
         break;
       default:
         return MaterialPageRoute(builder: (_) => const LoginPage());

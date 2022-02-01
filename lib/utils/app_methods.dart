@@ -6,6 +6,7 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:intl/intl.dart';
 import 'package:to_do/cubit/auth/auth_cubit.dart';
 import 'package:to_do/cubit/color_picker/color_cubit.dart';
+import 'package:to_do/cubit/nav/nav_cubit.dart';
 import 'package:to_do/utils/app_colors.dart';
 import 'package:to_do/utils/app_strings.dart';
 import 'package:to_do/utils/text_styles.dart';
@@ -53,17 +54,6 @@ class AppMethods {
   //get timestamp
   static int getTimeStamp() => DateTime.now().microsecondsSinceEpoch;
 
-  //store notes in firebase
-  static bool storeNoteInFirebase(String title, String notes, int? color) {
-    _firestoreInstance.collection("notes").doc(getUid()).collection("user_notes").doc().set({
-      'timestamp': getTimeStamp(),
-      'title': title,
-      'notes': notes,
-      'color': color ?? AppColors.primaryColor.value,
-    }).onError((error, stackTrace) => false);
-    return true;
-  }
-
   //get converted time
   static String getConvertedTime(int timestamp) {
     var convertedDate = DateTime.fromMicrosecondsSinceEpoch(timestamp);
@@ -73,14 +63,30 @@ class AppMethods {
 
   //retrieve notes from firebase
   static Stream<QuerySnapshot<Map<String, dynamic>>> getNotes() {
-    return _firestoreInstance.collection("notes").doc(getUid()).collection("user_notes").snapshots();
+    return _firestoreInstance
+        .collection("notes")
+        .doc(getUid())
+        .collection("user_notes")
+        .snapshots();
   }
 
   //add notes
   static void addNotes(BuildContext context, String title, String notes) {
     bool isDone;
     var _cubit = BlocProvider.of<ColorCubit>(context);
-    isDone = AppMethods.storeNoteInFirebase(title, notes, _cubit.pickedColor?.value);
+    _firestoreInstance
+        .collection("notes")
+        .doc(getUid())
+        .collection("user_notes")
+        .doc()
+        .set({
+      'timestamp': getTimeStamp(),
+      'title': title,
+      'notes': notes,
+      'color': _cubit.pickedColor?.value ?? AppColors.primaryColor.value,
+    }).onError((error, stackTrace) => isDone = false);
+    isDone = true;
+
     if (isDone) {
       Scaffold.of(context)
           .showSnackBar(const SnackBar(content: Text("Note Added")));
@@ -91,6 +97,99 @@ class AppMethods {
     }
   }
 
+  //retrieve note
+  static Future<DocumentSnapshot<Map<String, dynamic>>> getNote(
+      BuildContext context, String noteId) {
+    return _firestoreInstance
+        .collection("notes")
+        .doc(getUid())
+        .collection("user_notes")
+        .doc(noteId)
+        .get();
+  }
+
+  //update note
+  static void updateNote(
+      BuildContext context, String noteId, String title, String notes) {
+    bool isDone;
+    var _cubit = BlocProvider.of<ColorCubit>(context);
+    _firestoreInstance
+        .collection("notes")
+        .doc(getUid())
+        .collection("user_notes")
+        .doc(noteId)
+        .update({
+      'timestamp': getTimeStamp(),
+      'title': title,
+      'notes': notes,
+      'color': _cubit.pickedColor?.value ?? AppColors.primaryColor.value,
+    }).onError((error, stackTrace) => isDone = false);
+
+    isDone = true;
+    if (isDone) {
+      Scaffold.of(context)
+          .showSnackBar(const SnackBar(content: Text("Note Updated")));
+    } else {
+      Scaffold.of(context).showSnackBar(const SnackBar(
+        content: Text("There was some error updating the note"),
+      ));
+    }
+  }
+
+  //delete note
+  static void deleteNote(BuildContext context, String noteId) {
+    _firestoreInstance
+        .collection("notes")
+        .doc(getUid())
+        .collection("user_notes")
+        .doc(noteId)
+        .delete()
+        .onError((error, stackTrace) {
+      Scaffold.of(context).showSnackBar(const SnackBar(
+        content: Text("There was some error deleting the note"),
+      ));
+      return;
+    });
+    Navigator.of(context).pop();
+    Navigator.of(context).pop();
+  }
+
+  //delete alert
+  static void showDeleteWarning(BuildContext context, String noteId) {
+    AlertDialog alert = AlertDialog(
+      title: const Text("Warning"),
+      content: const Text("Are you sure you want to delete the note?"),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(
+            "Cancel",
+            style: TextStyles.primaryRegular.copyWith(
+              fontSize: 14.0,
+            ),
+          ),
+        ),
+        TextButton(
+          onPressed: () => deleteNote(context, noteId),
+          child: Text(
+            "Delete",
+            style: TextStyles.primaryRegular.copyWith(
+              fontSize: 14.0,
+              color: Colors.red,
+            ),
+          ),
+        ),
+      ],
+    );
+
+    showDialog(
+        context: context,
+        builder: (ctx) {
+          return alert;
+        });
+  }
+
+  //color picker dialog
   static void openColorPicker(BuildContext context, [Color? pickedColor]) {
     showDialog(
       context: context,
@@ -125,5 +224,4 @@ class AppMethods {
     final colorCubit = BlocProvider.of<ColorCubit>(context);
     colorCubit.setColor(color);
   }
-
 }

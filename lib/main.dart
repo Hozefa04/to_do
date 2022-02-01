@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:to_do/cubit/auth/auth_cubit.dart';
 import 'package:to_do/cubit/color_picker/color_cubit.dart';
+import 'package:to_do/cubit/nav/nav_cubit.dart';
 import 'package:to_do/router/app_router.dart';
+import 'package:to_do/screens/landing_page.dart';
 import 'package:to_do/utils/app_colors.dart';
 
 void main() async {
@@ -17,11 +19,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final AppRouter _appRouter = AppRouter();
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => AuthCubit()),
         BlocProvider(create: (_) => ColorCubit()),
+        BlocProvider(create: (_) => NavCubit()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -29,7 +31,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        onGenerateRoute: _appRouter.onGenerateRoute,
+        home: const LandingPage(),
       ),
     );
   }

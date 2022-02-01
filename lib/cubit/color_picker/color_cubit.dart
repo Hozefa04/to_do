@@ -10,6 +10,7 @@ part 'color_state.dart';
 
 class ColorCubit extends Cubit<ColorState> {
   Color? pickedColor;
+
   ColorCubit() : super(const ColorInitial());
 
   Color? get selectedColor => pickedColor;
