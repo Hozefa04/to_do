@@ -68,18 +68,24 @@ class NotesBuilder extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return Container(
-            margin: const EdgeInsets.only(left: 16.0, right: 16.0, top: 22.0),
+            margin: const EdgeInsets.only(
+              left: 16.0,
+              right: 16.0,
+              top: 22.0,
+              bottom: 12.0,
+            ),
             child: MasonryGridView.builder(
-                mainAxisSpacing: 12.0,
-                crossAxisSpacing: 12.0,
-                itemCount: snapshot.data?.docs.length,
-                gridDelegate:
-                    const SliverSimpleGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                ),
-                itemBuilder: (context, index) {
-                  return NotesCard(snapshot: snapshot.data?.docs[index]);
-                }),
+              mainAxisSpacing: 12.0,
+              crossAxisSpacing: 12.0,
+              itemCount: snapshot.data?.docs.length,
+              gridDelegate:
+                  const SliverSimpleGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+              ),
+              itemBuilder: (context, index) {
+                return NotesCard(snapshot: snapshot.data?.docs[index]);
+              },
+            ),
           );
         }
         return const CustomLoading();
@@ -97,7 +103,8 @@ class NotesCard extends StatelessWidget {
     var _navCubit = BlocProvider.of<NavCubit>(context);
     var _notesId = snapshot?.reference.id ?? "Null";
     return InkWell(
-      onTap: () => _navCubit.routeToPage(context, UpdateNotesPage(noteId: _notesId)),
+      onTap: () =>
+          _navCubit.routeToPage(context, UpdateNotesPage(noteId: _notesId)),
       child: Container(
         padding: const EdgeInsets.all(22.0),
         decoration: BoxDecoration(

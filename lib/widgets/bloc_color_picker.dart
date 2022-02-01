@@ -5,18 +5,12 @@ import 'package:to_do/utils/app_colors.dart';
 import 'package:to_do/utils/app_methods.dart';
 
 class BlocColorPicker extends StatelessWidget {
-  final bool isUpdate;
-  const BlocColorPicker({Key? key, this.isUpdate = false}) : super(key: key);
+  const BlocColorPicker({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ColorCubit, ColorState>(
       builder: (context, state) {
-        if(isUpdate) {
-          if(state is ColorInitial) {
-
-          }
-        }
         if (state is ColorPicked) {
           return InkWell(
             onTap: () => AppMethods.openColorPicker(context, state.pickedColor),

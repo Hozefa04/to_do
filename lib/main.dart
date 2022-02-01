@@ -4,9 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:to_do/cubit/auth/auth_cubit.dart';
 import 'package:to_do/cubit/color_picker/color_cubit.dart';
 import 'package:to_do/cubit/nav/nav_cubit.dart';
-import 'package:to_do/router/app_router.dart';
+import 'package:to_do/cubit/notes/notes_cubit.dart';
 import 'package:to_do/screens/landing_page.dart';
-import 'package:to_do/utils/app_colors.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,6 +23,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => AuthCubit()),
         BlocProvider(create: (_) => ColorCubit()),
         BlocProvider(create: (_) => NavCubit()),
+        BlocProvider(create: (_) => NotesCubit()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
