@@ -11,14 +11,17 @@ class LandingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocBuilder<AuthCubit, AuthState>(
-        builder: (context, state) {
-          if(state.isSignedIn) {
-            return const HomePage();
-          } else {
-            return const LoginPage();
-          }
-        },
+      body: BlocProvider(
+        create: (_) => AuthCubit(),
+        child: BlocBuilder<AuthCubit, AuthState>(
+          builder: (context, state) {
+            if(state.isSignedIn) {
+              return const HomePage();
+            } else {
+              return const LoginPage();
+            }
+          },
+        ),
       ),
     );
   }

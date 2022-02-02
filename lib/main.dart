@@ -2,7 +2,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:to_do/cubit/auth/auth_cubit.dart';
-import 'package:to_do/cubit/nav/nav_cubit.dart';
 import 'package:to_do/cubit/notes/notes_cubit.dart';
 import 'package:to_do/screens/landing_page.dart';
 
@@ -19,8 +18,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => AuthCubit()),
-        BlocProvider(create: (_) => NavCubit()),
         BlocProvider(create: (_) => NotesCubit()),
       ],
       child: MaterialApp(

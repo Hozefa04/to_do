@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:to_do/cubit/nav/nav_cubit.dart';
 import 'package:to_do/cubit/notes/notes_cubit.dart';
 import 'package:to_do/models/notes_model.dart';
 import 'package:to_do/screens/notes_page.dart';
@@ -18,7 +17,6 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var _navCubit = BlocProvider.of<NavCubit>(context);
     var _notesCubit = BlocProvider.of<NotesCubit>(context);
     var uid = AppMethods.getUid() ?? "";
     _notesCubit.getNotes(uid);
@@ -32,7 +30,7 @@ class HomePage extends StatelessWidget {
           ],
         ),
         floatingActionButton: CustomFloatingButton(
-          onPressed: () => _navCubit.routeToPage(context, const NotesPage()),
+          onPressed: () => AppMethods.routeToPage(context, const NotesPage()),
           icon: Icons.note_add_rounded,
         ),
         body: RefreshIndicator(
@@ -111,11 +109,9 @@ class NotesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var _navCubit = BlocProvider.of<NavCubit>(context);
-
     return InkWell(
       onTap: () {
-        _navCubit.routeToPage(
+        AppMethods.routeToPage(
           context,
           NotesPage(
             isUpdate: true,

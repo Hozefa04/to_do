@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:to_do/cubit/color_picker/color_cubit.dart';
-import 'package:to_do/cubit/notes/notes_cubit.dart';
 import 'package:to_do/models/notes_model.dart';
 import 'package:to_do/utils/app_colors.dart';
 import 'package:to_do/utils/app_methods.dart';
@@ -22,8 +21,6 @@ class NotesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final titleController = TextEditingController();
     final notesController = TextEditingController();
-
-    var _notesCubit = BlocProvider.of<NotesCubit>(context);
 
     return BlocProvider(
       create: (_) => ColorCubit(),
@@ -65,7 +62,7 @@ class NotesPage extends StatelessWidget {
                 );
               } else {
                 if (titleController.text != "") {
-                  _notesCubit.addNotes(
+                  AppMethods.addNotes(
                       ctx, titleController.text, notesController.text);
                 } else {
                   Scaffold.of(ctx).showSnackBar(

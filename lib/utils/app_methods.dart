@@ -6,7 +6,6 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:intl/intl.dart';
 import 'package:to_do/cubit/auth/auth_cubit.dart';
 import 'package:to_do/cubit/color_picker/color_cubit.dart';
-import 'package:to_do/cubit/nav/nav_cubit.dart';
 import 'package:to_do/utils/app_colors.dart';
 import 'package:to_do/utils/app_strings.dart';
 import 'package:to_do/utils/text_styles.dart';
@@ -14,6 +13,13 @@ import 'package:to_do/utils/text_styles.dart';
 class AppMethods {
   static final _auth = FirebaseAuth.instance;
   static final _firestoreInstance = FirebaseFirestore.instance;
+
+  //routing
+  static Widget? routeToPage(BuildContext context, Widget page) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return page;
+    }));
+  }
 
   //google signin
   static Future<void> signInWithGoogle(BuildContext context) async {
@@ -81,6 +87,47 @@ class AppMethods {
         .get();
   }
 
+  //add notes
+  static void addNotes(BuildContext context, String title, String notes) {
+    bool isDone;
+
+    var _firestoreInstance = FirebaseFirestore.instance;
+
+    var _colorCubit = BlocProvider.of<ColorCubit>(context);
+
+    var docId = _firestoreInstance
+        .collection("notes")
+        .doc(getUid())
+        .collection("user_notes")
+        .doc()
+        .id;
+
+    _firestoreInstance
+        .collection("notes")
+        .doc(getUid())
+        .collection("user_notes")
+        .doc(docId)
+        .set({
+      'timestamp': getTimeStamp(),
+      'title': title,
+      'notes': notes,
+      'color': _colorCubit.pickedColor?.value ?? AppColors.primaryColor.value,
+      'id': docId,
+    }).onError((error, stackTrace) => isDone = false);
+    isDone = true;
+
+    if (isDone) {
+      Scaffold.of(context)
+          .showSnackBar(SnackBar(content: Text(AppStrings.snackBarNoteAdded)));
+    } else {
+      Scaffold.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppStrings.snackBarAddNoteError),
+        ),
+      );
+    }
+  }
+
   //update note
   static void updateNote(
       BuildContext context, String? noteId, String title, String notes) {
@@ -92,7 +139,6 @@ class AppMethods {
         .collection("user_notes")
         .doc(noteId)
         .update({
-      'timestamp': getTimeStamp(),
       'title': title,
       'notes': notes,
       'color': _cubit.pickedColor?.value ?? AppColors.primaryColor.value,
