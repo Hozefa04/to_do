@@ -4,8 +4,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:to_do/cubit/nav/nav_cubit.dart';
 import 'package:to_do/cubit/notes/notes_cubit.dart';
 import 'package:to_do/models/notes_model.dart';
-import 'package:to_do/screens/add_notes_page.dart';
-import 'package:to_do/screens/update_notes_page.dart';
+import 'package:to_do/screens/notes_page.dart';
 import 'package:to_do/utils/app_colors.dart';
 import 'package:to_do/utils/app_methods.dart';
 import 'package:to_do/utils/app_strings.dart';
@@ -33,7 +32,7 @@ class HomePage extends StatelessWidget {
           ],
         ),
         floatingActionButton: CustomFloatingButton(
-          onPressed: () => _navCubit.routeToPage(context, const AddNotesPage()),
+          onPressed: () => _navCubit.routeToPage(context, const NotesPage()),
           icon: Icons.note_add_rounded,
         ),
         body: RefreshIndicator(
@@ -44,7 +43,7 @@ class HomePage extends StatelessWidget {
               _notesCubit.getNotes(uid);
             });
           },
-          child: const NotesBuilder(),
+          child: const BlocNotesBuilder(),
         ),
       ),
     );
@@ -72,8 +71,8 @@ class ProfileButton extends StatelessWidget {
   }
 }
 
-class NotesBuilder extends StatelessWidget {
-  const NotesBuilder({Key? key}) : super(key: key);
+class BlocNotesBuilder extends StatelessWidget {
+  const BlocNotesBuilder({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -116,7 +115,13 @@ class NotesCard extends StatelessWidget {
 
     return InkWell(
       onTap: () {
-        _navCubit.routeToPage(context, UpdateNotesPage(noteId: snapshot.id));
+        _navCubit.routeToPage(
+          context,
+          NotesPage(
+            isUpdate: true,
+            note: snapshot,
+          ),
+        );
       },
       child: Container(
         padding: const EdgeInsets.all(22.0),

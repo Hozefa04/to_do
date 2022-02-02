@@ -7,7 +7,7 @@ import 'package:to_do/cubit/color_picker/color_cubit.dart';
 import 'package:to_do/models/notes_model.dart';
 import 'package:to_do/utils/app_colors.dart';
 import 'package:to_do/utils/app_methods.dart';
-
+import 'package:to_do/utils/app_strings.dart';
 part 'notes_state.dart';
 
 class NotesCubit extends Cubit<NotesState> {
@@ -58,12 +58,13 @@ class NotesCubit extends Cubit<NotesState> {
 
     if (isDone) {
       Scaffold.of(context)
-          .showSnackBar(const SnackBar(content: Text("Note Added")));
+          .showSnackBar(SnackBar(content: Text(AppStrings.snackBarNoteAdded)));
     } else {
-      Scaffold.of(context).showSnackBar(const SnackBar(
-        content: Text("There was some error adding the note"),
-      ));
+      Scaffold.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppStrings.snackBarAddNoteError),
+        ),
+      );
     }
   }
-
 }

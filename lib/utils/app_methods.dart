@@ -83,7 +83,7 @@ class AppMethods {
 
   //update note
   static void updateNote(
-      BuildContext context, String noteId, String title, String notes) {
+      BuildContext context, String? noteId, String title, String notes) {
     bool isDone;
     var _cubit = BlocProvider.of<ColorCubit>(context);
     _firestoreInstance

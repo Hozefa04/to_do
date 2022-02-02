@@ -14,17 +14,46 @@ class LoginPage extends StatelessWidget {
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            buildTitle(),
-            buildLogo(),
-            buildInkWell(context),
+          children: const [
+            AppTitle(),
+            AppLogo(),
+            SignInButton(),
           ],
         ),
       ),
     );
   }
+}
 
-  InkWell buildInkWell(BuildContext context) {
+class AppLogo extends StatelessWidget {
+  const AppLogo({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(80),
+      child: Image.asset(AppStrings.logoPath),
+    );
+  }
+}
+
+class AppTitle extends StatelessWidget {
+  const AppTitle({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      AppStrings.welcomeText,
+      style: TextStyles.heading,
+    );
+  }
+}
+
+class SignInButton extends StatelessWidget {
+  const SignInButton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     return InkWell(
       onTap: () => AppMethods.signInWithGoogle(context),
       child: Container(
@@ -54,20 +83,6 @@ class LoginPage extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-
-  Container buildLogo() {
-    return Container(
-      padding: const EdgeInsets.all(80),
-      child: Image.asset("assets/logo.png"),
-    );
-  }
-
-  Text buildTitle() {
-    return Text(
-      AppStrings.welcomeText,
-      style: TextStyles.heading,
     );
   }
 }

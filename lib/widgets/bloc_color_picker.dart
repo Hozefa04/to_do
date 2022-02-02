@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:to_do/cubit/color_picker/color_cubit.dart';
-import 'package:to_do/utils/app_colors.dart';
 import 'package:to_do/utils/app_methods.dart';
 
 class BlocColorPicker extends StatelessWidget {
-  const BlocColorPicker({Key? key}) : super(key: key);
+  final int color;
+  const BlocColorPicker({Key? key, this.color = 4278190080}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +34,7 @@ class BlocColorPicker extends StatelessWidget {
               margin: const EdgeInsets.only(right: 20),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.primaryColor,
+                color: Color(color),
               ),
               child: const Icon(Icons.color_lens_rounded),
             ),

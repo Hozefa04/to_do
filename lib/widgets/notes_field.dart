@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:to_do/utils/app_colors.dart';
+import 'package:to_do/utils/app_strings.dart';
 import 'package:to_do/utils/text_styles.dart';
 import 'custom_text_field.dart';
 
@@ -14,7 +15,7 @@ class NotesField extends StatelessWidget {
       child: CustomTextField(
         controller: controller,
         text: notes,
-        hintText: "Add your note",
+        hintText: AppStrings.noteHint,
         hintStyle: TextStyles.primaryRegular.copyWith(
           color: AppColors.greyColor,
           fontSize: 18.0,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:to_do/utils/app_strings.dart';
 import 'package:to_do/widgets/custom_text_field.dart';
 
 class TitleField extends StatelessWidget {
@@ -11,7 +12,7 @@ class TitleField extends StatelessWidget {
     return CustomTextField(
       controller: controller,
       text: title,
-      hintText: "Title",
+      hintText: AppStrings.titleHint,
       isMultiLine: false,
     );
   }
