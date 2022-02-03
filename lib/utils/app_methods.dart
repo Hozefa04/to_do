@@ -3,9 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
 import 'package:to_do/cubit/auth/auth_cubit.dart';
 import 'package:to_do/cubit/color_picker/color_cubit.dart';
+import 'package:to_do/main.dart';
 import 'package:to_do/utils/app_colors.dart';
 import 'package:to_do/utils/app_strings.dart';
 import 'package:to_do/utils/text_styles.dart';
@@ -27,7 +29,6 @@ class AppMethods {
     try {
       await _cubit.googleSignIn();
     } catch (e) {
-      print(e.toString());
       Scaffold.of(context).showSnackBar(
         SnackBar(
           content: Text(AppStrings.authError),
@@ -42,7 +43,6 @@ class AppMethods {
     try {
       await _cubit.logout();
     } catch (e) {
-      print(e.toString());
       Scaffold.of(context).showSnackBar(
         SnackBar(
           content: Text(AppStrings.authError),
@@ -87,6 +87,36 @@ class AppMethods {
         .get();
   }
 
+  static const AndroidNotificationChannel channel = AndroidNotificationChannel(
+    'high_importance_channel',
+    'High Importance notification',
+    description: 'Description of the notification',
+    importance: Importance.high,
+    playSound: true,
+  );
+
+  static final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+
+  //show notification
+  static void showNotification() {
+    flutterLocalNotificationsPlugin.show(
+      0,
+      "Note has been added",
+      "",
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          channel.id,
+          channel.name,
+          channelDescription: channel.description,
+          importance: Importance.high,
+          playSound: true,
+          icon: '@mipmap/ic_launcher',
+        ),
+      ),
+    );
+  }
+
   //add notes
   static void addNotes(BuildContext context, String title, String notes) {
     bool isDone;
@@ -119,6 +149,7 @@ class AppMethods {
     if (isDone) {
       Scaffold.of(context)
           .showSnackBar(SnackBar(content: Text(AppStrings.snackBarNoteAdded)));
+      showNotification();
     } else {
       Scaffold.of(context).showSnackBar(
         SnackBar(

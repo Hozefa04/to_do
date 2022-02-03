@@ -23,9 +23,9 @@ class HomePage extends StatelessWidget {
 
     return SafeArea(
       child: Scaffold(
-        appBar: const CustomAppBar(
-          title: "Notes",
-          actions: [
+        appBar: CustomAppBar(
+          title: AppStrings.appTitle,
+          actions: const [
             ProfileButton(),
           ],
         ),
